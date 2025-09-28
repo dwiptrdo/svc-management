@@ -1,0 +1,3 @@
+source/venv
+__pycache__
+*.db
