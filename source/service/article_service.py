@@ -1,28 +1,101 @@
 from bson import ObjectId
-from models.article_model import get_article_collection
+import models.model as model
+from time import perf_counter
+from fastapi.responses import JSONResponse
 
 def create_article(mongo_db, title: str, content: str):
-    col = get_article_collection(mongo_db)
-    article = {"title": title, "content": content}
-    result = col.insert_one(article)
-    article["_id"] = str(result.inserted_id)
-    return article
+    start = perf_counter()
+
+    try:
+        col = mongo_db["komputer"]
+        article = {"title": title, "content": content}
+        result = col.insert_one(article)
+        article["_id"] = str(result.inserted_id)
+
+        return model.Response(data=article, start_time=start)
+    except Exception as e:
+        return JSONResponse(
+            status_code=422,
+            content=model.Response(
+                data=None,
+                status=False,
+                message=str(e),
+                start_time=start
+            ).model_dump()
+        )
 
 def get_articles(mongo_db):
-    col = get_article_collection(mongo_db)
-    return [
-        {**doc, "_id": str(doc["_id"])}
-        for doc in col.find()
-    ]
+    start = perf_counter()
+
+    try:
+        col = mongo_db["komputer"]
+        datas = [
+            {**doc, "_id": str(doc["_id"])}
+            for doc in col.find()
+        ]
+
+        pagination = model.Pagination(
+            size=1,
+            totalPages=1,
+            totalElements=len(datas)
+        )
+        return model.Response(data=datas, start_time=start, pagination=pagination)
+    except Exception as e:
+        return JSONResponse(
+            status_code=422,
+            content=model.Response(
+                data=None,
+                status=False,
+                message=str(e),
+                start_time=start
+            ).model_dump()
+        )
 
 def get_article(mongo_db, article_id: str):
-    col = get_article_collection(mongo_db)
-    doc = col.find_one({"_id": article_id})
-    if doc:
-        doc["_id"] = str(doc["_id"])
-    return doc
+    start = perf_counter()
+
+    try:
+        col = mongo_db["komputer"]
+        doc = col.find_one({"_id": ObjectId(article_id)})
+        if doc:
+            doc["_id"] = str(doc["_id"])
+        
+        pagination = model.Pagination(
+            size=1,
+            totalPages=1,
+            totalElements=1
+        )
+
+        return model.Response(data=doc, start_time=start, pagination=pagination)
+    except Exception as e:
+        return JSONResponse(
+            status_code=422,
+            content=model.Response(
+                data=None,
+                status=False,
+                message=str(e),
+                start_time=start
+            ).model_dump()
+        )
 
 def delete_article(mongo_db, article_id: str):
-    col = get_article_collection(mongo_db)
-    result = col.delete_one({"_id": ObjectId(article_id)})
-    return result.deleted_count > 0
+    start = perf_counter()
+
+    try:
+        col = mongo_db["komputer"]
+        result = col.update_one(
+            {"_id": ObjectId(article_id)},
+            {"$set": {"is_deleted": True}}  # atau "status": False
+        )
+
+        return model.Response(data=None, start_time=start, message="Deleted Succesfully")
+    except Exception as e:
+        return JSONResponse(
+            status_code=422,
+            content=model.Response(
+                data=None,
+                status=False,
+                message=str(e),
+                start_time=start
+            ).model_dump()
+        )

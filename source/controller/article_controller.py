@@ -4,11 +4,11 @@ from service.article_service import create_article, get_articles, get_article, d
 
 router = APIRouter(prefix="/articles", tags=["articles"])
 
-@router.post("/")
+@router.post("/create")
 def create(title: str, content: str, mongo_db=Depends(get_mongo)):
     return create_article(mongo_db, title, content)
 
-@router.get("/")
+@router.get("/get-all")
 def read_all(mongo_db=Depends(get_mongo)):
     return get_articles(mongo_db)
 

@@ -2,10 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
-
-SECRET_KEY = "rahasia-super-kuat"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+import config.env as env
 
 security = HTTPBearer()
 
@@ -22,13 +19,13 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 
 def create_access_token(data: dict, expires_delta: int = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=expires_delta or ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes=expires_delta or env.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, env.SECRET_KEY, algorithm=env.ALGORITHM)
 
 def verify_token(token: str):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, env.SECRET_KEY, algorithms=[env.ALGORITHM])
         return payload
     except JWTError:
         return None

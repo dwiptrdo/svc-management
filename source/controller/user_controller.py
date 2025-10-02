@@ -30,7 +30,7 @@ def create_user(username: str, password: str, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(username: str, password: str, db: Session = Depends(get_db)):
-    user = user_service.authenticate_user(db, username, password)
+    user = user_service.login_user(db, username, password)
     if not user:
         raise HTTPException(status_code=401, detail="Username atau password salah")
     token = create_access_token({"sub": user.username})
