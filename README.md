@@ -66,6 +66,7 @@ uvicorn main:app --reload
 ```
 
 ## 📂 Project Structure
+```
 📦 svc-management
  ┣ 📂config     
  ┃ ┣ 📜db.py
@@ -85,7 +86,7 @@ uvicorn main:app --reload
  ┣ 📂utils      
  ┃ ┗ 📜utils.py
  ┗ 📜main.py    
-
+```
 ## Author
 
 👤 **dwiptrdo**
