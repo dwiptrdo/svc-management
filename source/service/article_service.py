@@ -1,7 +1,7 @@
-from bson import ObjectId
-import models.model as model
-from time import perf_counter
 from fastapi.responses import JSONResponse
+from time import perf_counter
+import models.model as model
+from bson import ObjectId
 
 def create_article(mongo_db, title: str, content: str):
     start = perf_counter()

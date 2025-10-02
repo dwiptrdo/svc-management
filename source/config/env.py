@@ -1,5 +1,5 @@
-import os
 from dotenv import load_dotenv
+import os
 
 # Load .env hanya sekali di sini
 load_dotenv()

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from config.db import get_mongo
 from service.article_service import create_article, get_articles, get_article, delete_article
+from config.db import get_mongo
 
 router = APIRouter(prefix="/articles", tags=["articles"])
 

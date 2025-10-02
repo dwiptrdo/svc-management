@@ -1,8 +1,8 @@
+from middleware.auth import get_current_user, create_access_token
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from config.db import SessionLocal
 from service import user_service
-from middleware.auth import get_current_user, create_access_token
 
 router = APIRouter()
 
