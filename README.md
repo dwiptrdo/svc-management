@@ -94,5 +94,3 @@ uvicorn main:app --reload
 
 - Github: [@dwiptrdo](https://github.com/dwiptrdo)
 - Instagram: [@_dwiptrdo](https://www.instagram.com/_dwiptrdo/)
-
-⚡ Made with Python 🐍

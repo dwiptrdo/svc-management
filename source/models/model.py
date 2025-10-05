@@ -1,6 +1,8 @@
+from pydantic import BaseModel, Field
 from typing import Optional, Any
-from pydantic import BaseModel
 from time import perf_counter
+
+import math
 
 class Pagination(BaseModel):
     size: int
@@ -17,12 +19,13 @@ class ResponseWrapper(BaseModel):
     metaData: MetaData
     data: Any
 
-class ListOptions(BaseModel):
-    path: str = "image"
-    limit: Optional[int] = 100
-    offset: Optional[int] = 0
-    sort_column: Optional[str] = "name"
-    sort_order: Optional[str] = "desc"
+class RPagination(BaseModel):
+    search: str = Field(default=None)
+    search_by: list = Field(default=[])
+    orderBy: str = Field(default="createdAt")
+    order: str = Field(default="desc")
+    page: int = Field(default=1)
+    size: int = Field(default=10)
 
 def Response(
     data: Any,
@@ -40,4 +43,13 @@ def Response(
             pagination=pagination
         ),
         data=data
+    )
+
+def build_pagination(param: RPagination, total_elements: int) -> Pagination:
+    size = max(1, param.size)  # biar gak 0
+    total_pages = math.ceil(total_elements / size) if total_elements else 0
+    return Pagination(
+        size=size,
+        totalPages=total_pages,
+        totalElements=total_elements
     )

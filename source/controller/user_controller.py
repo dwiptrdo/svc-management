@@ -1,51 +1,31 @@
-from middleware.auth import get_current_user, create_access_token
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from config.db import SessionLocal
-from service import user_service
+from fastapi import APIRouter, Depends
 
-router = APIRouter()
+from middleware.auth import get_current_user
+from service.user_service import UserService
+from config.db import get_mongo
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+import models.user_model as user
+import models.model as model
 
-@router.get("/users", dependencies=[Depends(get_current_user)])
-def list_users(db: Session = Depends(get_db)):
-    return user_service.get_users(db)
+service = UserService(get_mongo())
+router = APIRouter(prefix="/users", tags=["users"])
 
-@router.get("/users/{user_id}", dependencies=[Depends(get_current_user)])
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    user = user_service.get_user(db, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User tidak ditemukan")
-    return user
+@router.post("/create", dependencies=[Depends(get_current_user)])
+def Create_User(param: user.User):
+    return service.create_user(param)
 
-@router.post("/users")
-def create_user(username: str, password: str, db: Session = Depends(get_db)):
-    return user_service.create_user(db, username, password)
+@router.post("/get-all", dependencies=[Depends(get_current_user)])
+def Get_All_User(param: model.RPagination):
+    return service.get_all_user(param)
 
-@router.post("/login")
-def login(username: str, password: str, db: Session = Depends(get_db)):
-    user = user_service.login_user(db, username, password)
-    if not user:
-        raise HTTPException(status_code=401, detail="Username atau password salah")
-    token = create_access_token({"sub": user.username})
-    return {"access_token": token, "token_type": "bearer"}
+@router.get("/{id}", dependencies=[Depends(get_current_user)])
+def Get_User(id: str):
+    return service.get_user(id)
 
-@router.put("/users/{user_id}", dependencies=[Depends(get_current_user)])
-def update_user(user_id: int, username: str, db: Session = Depends(get_db)):
-    user = user_service.update_user(db, user_id, username)
-    if not user:
-        raise HTTPException(status_code=404, detail="User tidak ditemukan")
-    return user
+@router.put("/{id}", dependencies=[Depends(get_current_user)])
+def update_user(id: str, param: user.User):
+    return service.update_user(id, param)
 
-@router.delete("/users/{user_id}", dependencies=[Depends(get_current_user)])
-def delete_user(user_id: int, db: Session = Depends(get_db)):
-    user = user_service.delete_user(db, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User tidak ditemukan")
-    return {"message": "User berhasil dihapus"}
+@router.delete("/{id}", dependencies=[Depends(get_current_user)])
+def delete_user(id: str):
+    return service.delete_user(id)

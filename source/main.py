@@ -1,15 +1,17 @@
-from controller import user_controller, article_controller
-from config.db import Base, engine
 from fastapi import FastAPI
 import config.env as env
 
-# create postgres tables
-Base.metadata.create_all(bind=engine)
+from controller import user_controller, product_controller, auth_controller
 
-app = FastAPI()
+app = FastAPI(
+    root_path="/api/v1",
+    title="Service Management API",
+    description="API for managing users, products and authentication",
+)
 
+app.include_router(auth_controller.router)
 app.include_router(user_controller.router)
-app.include_router(article_controller.router)
+app.include_router(product_controller.router)
 
 if __name__ == "__main__":
     import uvicorn
