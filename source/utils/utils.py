@@ -1,22 +1,16 @@
-from passlib.hash import bcrypt
-import hashlib
+from argon2 import PasswordHasher
 
-def _normalize_password(password: str) -> str:
-    """
-    Bcrypt limit = 72 byte.
-    Kalau password lebih panjang, pakai sha256 hexdigest dulu.
-    """
-    if len(password.encode("utf-8")) > 72:
-        return hashlib.sha256(password.encode("utf-8")).hexdigest()
-    return password
+ph = PasswordHasher()
 
 def hash_password(password: str) -> str:
-    normalized = _normalize_password(password)
-    return bcrypt.hash(normalized)
+    return ph.hash(password)
 
 def verify_password(password: str, hashed: str) -> bool:
-    normalized = _normalize_password(password)
-    return bcrypt.verify(normalized, hashed)
+    try:
+        ph.verify(hashed, password)
+        return True
+    except Exception:
+        return False
 
 def GetEnv(env, senv):
     if env:
