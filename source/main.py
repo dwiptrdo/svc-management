@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 import config.env as env
 
@@ -7,6 +8,14 @@ app = FastAPI(
     root_path="/api/v1",
     title="Service Management API",
     description="API for managing users, products and authentication",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_controller.router)
