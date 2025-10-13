@@ -6,8 +6,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 # Install dependencies sistem minimal
-RUN apt-get update && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libffi-dev \
+    python3-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
