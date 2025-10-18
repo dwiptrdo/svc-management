@@ -30,7 +30,7 @@ class AuthService:
                 )
             
             token = create_access_token({"user_id": user["_id"], "email": user["email"]})
-            return model.Response(data={"access_token": token, "token_type": "bearer"}, start_time=start)
+            return model.Response(data={"access_token": token, "token_type": "bearer", "role": user["role"]}, start_time=start)
         except Exception as e:
             return JSONResponse(
                 status_code=422,
